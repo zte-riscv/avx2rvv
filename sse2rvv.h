@@ -1587,9 +1587,16 @@ FORCE_INLINE int _mm_cvtt_ss2si (__m128 a) {
   return (int)__riscv_vmv_x_s_i32m1_i32(a_i32);
 }
 
-// FORCE_INLINE __m128i _mm_cvttpd_epi32 (__m128d a) {}
+FORCE_INLINE __m128i _mm_cvttpd_epi32 (__m128d a) {
+  vint32m1_t b = __riscv_vlmul_ext_v_i32mf2_i32m1(__riscv_vfncvt_rtz_x_f_w_i32mf2(a, 2)); 
+  vbool32_t mask = __riscv_vreinterpret_v_i32m1_b32(__riscv_vmv_s_x_i32m1(0x03, 4));
+  vint32m1_t ans = __riscv_vmv_v_x_i32m1(0, 4);
+  return __riscv_vmerge_vvm_i32m1(ans, b, mask, 4);
+}
 
-// FORCE_INLINE __m64 _mm_cvttpd_pi32 (__m128d a) {}
+FORCE_INLINE __m64 _mm_cvttpd_pi32 (__m128d a) {
+  return _mm_cvttpd_epi32(a);
+}
 
 // FORCE_INLINE __m128i _mm_cvttps_epi32 (__m128 a) {}
 
