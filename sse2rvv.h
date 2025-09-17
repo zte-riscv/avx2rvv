@@ -1575,9 +1575,17 @@ FORCE_INLINE __int64 _mm_cvtss_si64 (__m128 a) {
   return (int64_t)__riscv_vmv_x_s_i64m1_i64(a_i64);
 }
 
-// FORCE_INLINE __m64 _mm_cvtt_ps2pi (__m128 a) {}
+FORCE_INLINE __m64 _mm_cvtt_ps2pi (__m128 a) {
+  vfloat32m1_t _a = vreinterpretq_m128_f32(a);
+  vint32m1_t a_i32 = __riscv_vfcvt_x_f_v_i32m1_rm(_a, __RISCV_FRM_RTZ, 2);
+  return vreinterpretq_i32_m64(a_i32);
+}
 
-// FORCE_INLINE int _mm_cvtt_ss2si (__m128 a) {}
+FORCE_INLINE int _mm_cvtt_ss2si (__m128 a) {
+  vfloat32m1_t _a = vreinterpretq_m128_f32(a);
+  vint32m1_t a_i32 = __riscv_vfcvt_x_f_v_i32m1_rm(_a, __RISCV_FRM_RTZ, 1);
+  return (int)__riscv_vmv_x_s_i32m1_i32(a_i32);
+}
 
 // FORCE_INLINE __m128i _mm_cvttpd_epi32 (__m128d a) {}
 

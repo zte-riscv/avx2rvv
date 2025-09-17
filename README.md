@@ -98,16 +98,16 @@ Examples:
   ./tests/main --verbose add        # Run tests matching 'add' with verbose output
 
 # Run one case by name
-./tests/main mm_crc32_u8
+  ./tests/main mm_crc32_u8
 ```
 Expected output (sample):
 ```
-Test mm_crc32_u8                    passed
-SSE2RVV_TEST Complete!
-Passed:  1
-Failed:  0
-Ignored: 0
-Coverage rate: 100.00%
+  Test mm_crc32_u8                    passed
+  SSE2RVV_TEST Complete!
+  Passed:  1
+  Failed:  0
+  Ignored: 0
+  Coverage rate: 100.00%
 ```
 
 ### Cross-compile for RISC‑V and run with QEMU
