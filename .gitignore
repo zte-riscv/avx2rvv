@@ -39,3 +39,7 @@
 
 # debug information files
 *.dwo
+*.o
+*.gch
+tests/*.d
+tests/main
