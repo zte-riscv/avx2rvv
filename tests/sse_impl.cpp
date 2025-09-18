@@ -1586,22 +1586,18 @@ result_t test_mm_cvtsi32_ss(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
 }
 
 result_t test_mm_cvtsi64_ss(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  //   const float *_a = impl.test_cases_float_pointer1;
-  //   const int64_t b = *(int64_t *)impl.test_cases_int_pointer2;
-  //
-  //   float dx = (float)b;
-  //   float dy = _a[1];
-  //   float dz = _a[2];
-  //   float dw = _a[3];
-  //
-  //   __m128 a = load_m128(_a);
-  //   __m128 c = _mm_cvtsi64_ss(a, b);
-  //
-  //   return validate_float(c, dx, dy, dz, dw);
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  const float *_a = impl.test_cases_float_pointer1;
+  const int64_t b = *(int64_t *)impl.test_cases_int_pointer2;
+
+  float dx = (float)b;
+  float dy = _a[1];
+  float dz = _a[2];
+  float dw = _a[3];
+
+  __m128 a = load_m128(_a);
+  __m128 c = _mm_cvtsi64_ss(a, b);
+
+  return validate_float(c, dx, dy, dz, dw);
 }
 
 result_t test_mm_cvtss_f32(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
@@ -4467,47 +4463,43 @@ result_t test_mm_cvtsi32_si128(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
 }
 
 result_t test_mm_cvtsi64_sd(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  //   const double *_a = (const double *)impl.test_cases_float_pointer1;
-  //   const int64_t b = (const int64_t)impl.test_cases_ints[iter];
-  //
-  //   __m128d a = load_m128d(_a);
-  //   __m128d c = _mm_cvtsi64_sd(a, b);
-  //
-  //   return validate_double(c, b, _a[1]);
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  const double *_a = (const double *)impl.test_cases_float_pointer1;
+  const int64_t b = (const int64_t)impl.test_cases_ints[iter];
+
+  __m128d a = load_m128d(_a);
+  __m128d c = _mm_cvtsi64_sd(a, b);
+
+  return validate_double(c, b, _a[1]);
 }
 
 result_t test_mm_cvtsi64_si128(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  //   const int64_t *_a = (const int64_t *)impl.test_cases_int_pointer1;
-  //
-  //   int64_t d = _a[0];
-  //
-  //   __m128i c = _mm_cvtsi64_si128(*_a);
-  //
-  //   return validate_int64(c, d, 0);
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  const int64_t *_a = (const int64_t *)impl.test_cases_int_pointer1;
+
+  int64_t d = _a[0];
+
+  __m128i c = _mm_cvtsi64_si128(*_a);
+
+  return validate_int64(c, d, 0);
 }
 
 result_t test_mm_cvtsi64x_sd(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  //   return test_mm_cvtsi64_sd(impl, iter);
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  const double *_a = (const double *)impl.test_cases_float_pointer1;
+  const int64_t b = (const int64_t)impl.test_cases_ints[iter];
+
+  __m128d a = load_m128d(_a);
+  __m128d c = _mm_cvtsi64x_sd(a, b);
+
+  return validate_double(c, b, _a[1]);
 }
 
 result_t test_mm_cvtsi64x_si128(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  //   return test_mm_cvtsi64_si128(impl, iter);
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  const int64_t *_a = (const int64_t *)impl.test_cases_int_pointer1;
+
+  int64_t d = _a[0];
+
+  __m128i c = _mm_cvtsi64x_si128(*_a);
+
+  return validate_int64(c, d, 0);
 }
 
 result_t test_mm_cvtss_sd(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
