@@ -1490,17 +1490,50 @@ FORCE_INLINE __m128i _mm_cvtepu8_epi64(__m128i a) {
 
 // FORCE_INLINE __m64 _mm_cvtpd_pi32 (__m128d a) {}
 
-// FORCE_INLINE __m128 _mm_cvtpd_ps (__m128d a) {}
+FORCE_INLINE __m128 _mm_cvtpd_ps (__m128d a) {
+  vfloat64m1_t a64 = vreinterpretq_m128d_f64(a);
+  vfloat32mf2_t f2 = __riscv_vfncvt_f_f_w_f32mf2(a64, 2);
+  vfloat32m1_t result = __riscv_vfmv_v_f_f32m1(0.0f, 4);
+  result = __riscv_vslideup_vx_f32m1_tu(result, __riscv_vlmul_ext_v_f32mf2_f32m1(f2), 0, 2);
+  return vreinterpretq_f32_m128(result);
+}
 
-// FORCE_INLINE __m128 _mm_cvtpi16_ps (__m64 a) {}
+FORCE_INLINE __m128 _mm_cvtpi16_ps (__m64 a) {
+  vint16m1_t _a = vreinterpretq_m64_i16(a);
+  vint32m1_t a_i32 = __riscv_vsext_vf2_i32m1(__riscv_vlmul_trunc_v_i16m1_i16mf2(_a), 4);
+  vfloat32m1_t a_f32 = __riscv_vfcvt_f_x_v_f32m1(a_i32, 4);
+  return vreinterpretq_f32_m128(a_f32);
+}
 
-// FORCE_INLINE __m128d _mm_cvtpi32_pd (__m64 a) {}
+FORCE_INLINE __m128d _mm_cvtpi32_pd (__m64 a) {
+  vint32m1_t _a = vreinterpretq_i32_m64(a);
+  vint64m1_t a_i64 = __riscv_vsext_vf2_i64m1(__riscv_vlmul_trunc_v_i32m1_i32mf2(_a), 2);
+  vfloat64m1_t a_f64 = __riscv_vfcvt_f_x_v_f64m1(a_i64, 2);
+  return vreinterpretq_f64_m128d(a_f64);
+}
 
-// FORCE_INLINE __m128 _mm_cvtpi32_ps (__m128 a, __m64 b) {}
+FORCE_INLINE __m128 _mm_cvtpi32_ps (__m128 a, __m64 b) {
+  vfloat32m1_t _a = vreinterpretq_m128_f32(a);
+  vint32m1_t _b = vreinterpretq_i32_m64(b);
+  vfloat32m1_t b_f32 = __riscv_vfcvt_f_x_v_f32m1(_b, 2);
+  vfloat32m1_t res = __riscv_vslideup_vx_f32m1_tu(_a, b_f32, 0, 2);
+  return vreinterpretq_f32_m128(res);
+}
 
-// FORCE_INLINE __m128 _mm_cvtpi32x2_ps (__m64 a, __m64 b) {}
+FORCE_INLINE __m128 _mm_cvtpi32x2_ps (__m64 a, __m64 b) {
+  vint32m1_t _a = vreinterpretq_i32_m64(a);
+  vint32m1_t _b = vreinterpretq_i32_m64(b);
+  vint32m1_t combined = __riscv_vslideup_vx_i32m1(_a, _b, 2, 4);
+  vfloat32m1_t res = __riscv_vfcvt_f_x_v_f32m1(combined, 4);
+  return vreinterpretq_f32_m128(res);
+}
 
-// FORCE_INLINE __m128 _mm_cvtpi8_ps (__m64 a) {}
+FORCE_INLINE __m128 _mm_cvtpi8_ps (__m64 a) {
+  vint8m1_t _a = vreinterpretq_m64_i8(a);
+  vint32m1_t a_i32 = __riscv_vsext_vf4_i32m1(__riscv_vlmul_trunc_v_i8m1_i8mf4(_a), 8);
+  vfloat32m1_t a_f32 = __riscv_vfcvt_f_x_v_f32m1(a_i32, 8);
+  return vreinterpretq_f32_m128(a_f32);
+}
 
 FORCE_INLINE __m128i _mm_cvtps_epi32(__m128 a) {
   vfloat32m1_t _a = vreinterpretq_m128_f32(a);
