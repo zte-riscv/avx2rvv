@@ -4618,49 +4618,34 @@ result_t test_mm_cvttps_epi32(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
 }
 
 result_t test_mm_cvttsd_si32(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  //   const double *_a = (const double *)impl.test_cases_float_pointer1;
-  //
-  //   __m128d a = _mm_load_sd(_a);
-  //   int32_t ret = _mm_cvttsd_si32(a);
-  //
-  //   return ret == (int32_t)_a[0] ? TEST_SUCCESS : TEST_FAIL;
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  const double *_a = (const double *)impl.test_cases_float_pointer1;
+
+  __m128d a = _mm_load_sd(_a);
+  int32_t ret = _mm_cvttsd_si32(a);
+
+  return ret == (int32_t)_a[0] ? TEST_SUCCESS : TEST_FAIL;
 }
 
 result_t test_mm_cvttsd_si64(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  //   const double *_a = (const double *)impl.test_cases_float_pointer1;
-  //
-  //   __m128d a = _mm_load_sd(_a);
-  //   int64_t ret = _mm_cvttsd_si64(a);
-  //
-  //   return ret == (int64_t)_a[0] ? TEST_SUCCESS : TEST_FAIL;
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  const double *_a = (const double *)impl.test_cases_float_pointer1;
+
+  __m128d a = _mm_load_sd(_a);
+  int64_t ret = _mm_cvttsd_si64(a);
+
+  return ret == (int64_t)_a[0] ? TEST_SUCCESS : TEST_FAIL;
 }
 
 result_t test_mm_cvttsd_si64x(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  // #if defined(__clang__)
-  // The intrinsic _mm_cvttsd_si64x() does not exist in Clang
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
-  // #else
-  //   const double *_a = (const double *)impl.test_cases_float_pointer1;
-  //
-  //   __m128d a = _mm_load_sd(_a);
-  //   int64_t ret = _mm_cvttsd_si64x(a);
-  //
-  //   return ret == (int64_t)_a[0] ? TEST_SUCCESS : TEST_FAIL;
-  // #endif
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  #if defined(__clang__)
+    The intrinsic _mm_cvttsd_si64x() does not exist in Clang
+  #else
+    const double *_a = (const double *)impl.test_cases_float_pointer1;
+  
+    __m128d a = _mm_load_sd(_a);
+    int64_t ret = _mm_cvttsd_si64x(a);
+  
+    return ret == (int64_t)_a[0] ? TEST_SUCCESS : TEST_FAIL;
+  #endif
 }
 
 result_t test_mm_div_pd(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
