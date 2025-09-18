@@ -1543,21 +1543,45 @@ FORCE_INLINE __m128 _mm_cvtpu8_ps (__m64 a) {
   return __riscv_vfcvt_f_xu_v_f32m1(v_u32, 4);
 }
 
-// FORCE_INLINE double _mm_cvtsd_f64 (__m128d a) {}
+FORCE_INLINE double _mm_cvtsd_f64 (__m128d a) {
+  vfloat64m1_t _a = vreinterpretq_m128d_f64(a);
+  return __riscv_vfmv_f_s_f64m1_f64(_a);
+}
 
-// FORCE_INLINE int _mm_cvtsd_si32 (__m128d a) {}
+FORCE_INLINE int _mm_cvtsd_si32 (__m128d a) {
+  vint32mf2_t b = __riscv_vfncvt_x_f_w_i32mf2(a, 1);
+  return __riscv_vmv_x_s_i32mf2_i32(b);
+}
 
 // FORCE_INLINE __int64 _mm_cvtsd_si64 (__m128d a) {}
 
 // FORCE_INLINE __int64 _mm_cvtsd_si64x (__m128d a) {}
 
-// FORCE_INLINE __m128 _mm_cvtsd_ss (__m128 a, __m128d b) {}
+FORCE_INLINE __m128 _mm_cvtsd_ss (__m128 a, __m128d b) {
+  vfloat32m1_t _a = vreinterpretq_m128_f32(a);
+  vfloat64m1_t _b = vreinterpretq_m128d_f64(b);
 
-// FORCE_INLINE int _mm_cvtsi128_si32 (__m128i a) {}
+  double b0 = __riscv_vfmv_f_s_f64m1_f64(_b);
+  vfloat32m1_t b_f32 = __riscv_vfmv_v_f_f32m1((float)b0, 1);
 
-// FORCE_INLINE __int64 _mm_cvtsi128_si64 (__m128i a) {}
+  vfloat32m1_t res = __riscv_vslideup_vx_f32m1_tu(_a, b_f32, 0, 1);
+  return vreinterpretq_f32_m128(res);
+}
 
-// FORCE_INLINE __int64 _mm_cvtsi128_si64x (__m128i a) {}
+FORCE_INLINE int _mm_cvtsi128_si32 (__m128i a) {
+  vint32m1_t _a = vreinterpretq_i32_m128i(a);
+  return __riscv_vmv_x_s_i32m1_i32(_a);
+}
+
+FORCE_INLINE __int64 _mm_cvtsi128_si64 (__m128i a) {
+  vint64m1_t _a = vreinterpretq_m64_i64(a);
+  return __riscv_vmv_x_s_i64m1_i64(_a);
+}
+
+FORCE_INLINE __int64 _mm_cvtsi128_si64x (__m128i a) {
+  vint64m1_t _a = vreinterpretq_m64_i64(a);
+  return __riscv_vmv_x_s_i64m1_i64(_a);
+}
 
 // FORCE_INLINE __m128d _mm_cvtsi32_sd (__m128d a, int b) {}
 
