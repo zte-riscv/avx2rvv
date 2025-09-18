@@ -1438,120 +1438,108 @@ result_t test_mm_cvtpi8_ps(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
 }
 
 result_t test_mm_cvtps_pi16(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  //   const float *_a = impl.test_cases_float_pointer1;
-  //   int16_t rnd[4];
-  //
-  //   for (int i = 0; i < 4; i++) {
-  //     if ((float)INT16_MAX <= _a[i] && _a[i] <= (float)INT32_MAX) {
-  //       rnd[i] = INT16_MAX;
-  //     } else if (INT16_MIN < _a[i] && _a[i] < INT16_MAX) {
-  //       switch (iter & 0x3) {
-  //       case 0:
-  //         _MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
-  //         rnd[i] = (int16_t)bankers_rounding(_a[i]);
-  //         break;
-  //       case 1:
-  //         _MM_SET_ROUNDING_MODE(_MM_ROUND_DOWN);
-  //         rnd[i] = (int16_t)floorf(_a[i]);
-  //         break;
-  //       case 2:
-  //         _MM_SET_ROUNDING_MODE(_MM_ROUND_UP);
-  //         rnd[i] = (int16_t)ceilf(_a[i]);
-  //         break;
-  //       case 3:
-  //         _MM_SET_ROUNDING_MODE(_MM_ROUND_TOWARD_ZERO);
-  //         rnd[i] = (int16_t)_a[i];
-  //         break;
-  //       }
-  //     } else {
-  //       rnd[i] = INT16_MIN;
-  //     }
-  //   }
-  //
-  //   __m128 a = load_m128(_a);
-  //   __m64 ret = _mm_cvtps_pi16(a);
-  //   return VALIDATE_INT16_M64(ret, rnd);
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  const float *_a = impl.test_cases_float_pointer1;
+  int16_t rnd[4];
+
+  for (int i = 0; i < 4; i++) {
+    if ((float)INT16_MAX <= _a[i] && _a[i] <= (float)INT32_MAX) {
+      rnd[i] = INT16_MAX;
+    } else if (INT16_MIN < _a[i] && _a[i] < INT16_MAX) {
+      switch (iter & 0x3) {
+      case 0:
+        _MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
+        rnd[i] = (int16_t)bankers_rounding(_a[i]);
+        break;
+      case 1:
+        _MM_SET_ROUNDING_MODE(_MM_ROUND_DOWN);
+        rnd[i] = (int16_t)floorf(_a[i]);
+        break;
+      case 2:
+        _MM_SET_ROUNDING_MODE(_MM_ROUND_UP);
+        rnd[i] = (int16_t)ceilf(_a[i]);
+        break;
+      case 3:
+        _MM_SET_ROUNDING_MODE(_MM_ROUND_TOWARD_ZERO);
+        rnd[i] = (int16_t)_a[i];
+        break;
+      }
+    } else {
+      rnd[i] = INT16_MIN;
+    }
+  }
+
+  __m128 a = load_m128(_a);
+  __m64 ret = _mm_cvtps_pi16(a);
+  return VALIDATE_INT16_M64(ret, rnd);
 }
 
 result_t test_mm_cvtps_pi32(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  //   const float *_a = impl.test_cases_float_pointer1;
-  //   int32_t d[2];
-  //
-  //   switch (iter & 0x3) {
-  //   case 0:
-  //     _MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
-  //     d[0] = (int32_t)bankers_rounding(_a[0]);
-  //     d[1] = (int32_t)bankers_rounding(_a[1]);
-  //     break;
-  //   case 1:
-  //     _MM_SET_ROUNDING_MODE(_MM_ROUND_DOWN);
-  //     d[0] = (int32_t)floorf(_a[0]);
-  //     d[1] = (int32_t)floorf(_a[1]);
-  //     break;
-  //   case 2:
-  //     _MM_SET_ROUNDING_MODE(_MM_ROUND_UP);
-  //     d[0] = (int32_t)ceilf(_a[0]);
-  //     d[1] = (int32_t)ceilf(_a[1]);
-  //     break;
-  //   case 3:
-  //     _MM_SET_ROUNDING_MODE(_MM_ROUND_TOWARD_ZERO);
-  //     d[0] = (int32_t)_a[0];
-  //     d[1] = (int32_t)_a[1];
-  //     break;
-  //   }
-  //
-  //   __m128 a = load_m128(_a);
-  //   __m64 ret = _mm_cvtps_pi32(a);
-  //
-  //   return VALIDATE_INT32_M64(ret, d);
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  const float *_a = impl.test_cases_float_pointer1;
+  int32_t d[2];
+
+  switch (iter & 0x3) {
+  case 0:
+    _MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
+    d[0] = (int32_t)bankers_rounding(_a[0]);
+    d[1] = (int32_t)bankers_rounding(_a[1]);
+    break;
+  case 1:
+    _MM_SET_ROUNDING_MODE(_MM_ROUND_DOWN);
+    d[0] = (int32_t)floorf(_a[0]);
+    d[1] = (int32_t)floorf(_a[1]);
+    break;
+  case 2:
+    _MM_SET_ROUNDING_MODE(_MM_ROUND_UP);
+    d[0] = (int32_t)ceilf(_a[0]);
+    d[1] = (int32_t)ceilf(_a[1]);
+    break;
+  case 3:
+    _MM_SET_ROUNDING_MODE(_MM_ROUND_TOWARD_ZERO);
+    d[0] = (int32_t)_a[0];
+    d[1] = (int32_t)_a[1];
+    break;
+  }
+
+  __m128 a = load_m128(_a);
+  __m64 ret = _mm_cvtps_pi32(a);
+
+  return VALIDATE_INT32_M64(ret, d);
 }
 
 result_t test_mm_cvtps_pi8(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  //   const float *_a = impl.test_cases_float_pointer1;
-  //   int8_t rnd[8] = {};
-  //
-  //   for (int i = 0; i < 4; i++) {
-  //     if ((float)INT8_MAX <= _a[i] && _a[i] <= (float)INT32_MAX) {
-  //       rnd[i] = INT8_MAX;
-  //     } else if (INT8_MIN < _a[i] && _a[i] < INT8_MAX) {
-  //       switch (iter & 0x3) {
-  //       case 0:
-  //         _MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
-  //         rnd[i] = (int8_t)bankers_rounding(_a[i]);
-  //         break;
-  //       case 1:
-  //         _MM_SET_ROUNDING_MODE(_MM_ROUND_DOWN);
-  //         rnd[i] = (int8_t)floorf(_a[i]);
-  //         break;
-  //       case 2:
-  //         _MM_SET_ROUNDING_MODE(_MM_ROUND_UP);
-  //         rnd[i] = (int8_t)ceilf(_a[i]);
-  //         break;
-  //       case 3:
-  //         _MM_SET_ROUNDING_MODE(_MM_ROUND_TOWARD_ZERO);
-  //         rnd[i] = (int8_t)_a[i];
-  //         break;
-  //       }
-  //     } else {
-  //       rnd[i] = INT8_MIN;
-  //     }
-  //   }
-  //
-  //   __m128 a = load_m128(_a);
-  //   __m64 ret = _mm_cvtps_pi8(a);
-  //   return VALIDATE_INT8_M64(ret, rnd);
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  const float *_a = impl.test_cases_float_pointer1;
+  int8_t rnd[8] = {};
+
+  for (int i = 0; i < 4; i++) {
+    if ((float)INT8_MAX <= _a[i] && _a[i] <= (float)INT32_MAX) {
+      rnd[i] = INT8_MAX;
+    } else if (INT8_MIN < _a[i] && _a[i] < INT8_MAX) {
+      switch (iter & 0x3) {
+      case 0:
+        _MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
+        rnd[i] = (int8_t)bankers_rounding(_a[i]);
+        break;
+      case 1:
+        _MM_SET_ROUNDING_MODE(_MM_ROUND_DOWN);
+        rnd[i] = (int8_t)floorf(_a[i]);
+        break;
+      case 2:
+        _MM_SET_ROUNDING_MODE(_MM_ROUND_UP);
+        rnd[i] = (int8_t)ceilf(_a[i]);
+        break;
+      case 3:
+        _MM_SET_ROUNDING_MODE(_MM_ROUND_TOWARD_ZERO);
+        rnd[i] = (int8_t)_a[i];
+        break;
+      }
+    } else {
+      rnd[i] = INT8_MIN;
+    }
+  }
+
+  __m128 a = load_m128(_a);
+  __m64 ret = _mm_cvtps_pi8(a);
+  return VALIDATE_INT8_M64(ret, rnd);
 }
 
 result_t test_mm_cvtpu16_ps(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
@@ -4330,18 +4318,14 @@ result_t test_mm_cvtps_epi32(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
 }
 
 result_t test_mm_cvtps_pd(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
-  // #ifdef ENABLE_TEST_ALL
-  //   const float *_a = impl.test_cases_float_pointer1;
-  //   double d0 = (double)_a[0];
-  //   double d1 = (double)_a[1];
-  //   const __m128 a = load_m128(_a);
-  //
-  //   __m128d r = _mm_cvtps_pd(a);
-  //
-  //   return validate_double(r, d0, d1);
-  // #else
-  return TEST_UNIMPL;
-  // #endif  // ENABLE_TEST_ALL
+  const float *_a = impl.test_cases_float_pointer1;
+  double d0 = (double)_a[0];
+  double d1 = (double)_a[1];
+  const __m128 a = load_m128(_a);
+
+  __m128d r = _mm_cvtps_pd(a);
+
+  return validate_double(r, d0, d1);
 }
 
 result_t test_mm_cvtsd_f64(const SSE2RVV_TEST_IMPL &impl, uint32_t iter) {
