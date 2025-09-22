@@ -1,4 +1,4 @@
-# avx2rvv
+# AVX2RVV: AVX512 Intrinsics Implementation for RISC-V Vector Extension
 
 ## Overview
 
@@ -60,6 +60,7 @@ Header file | Extension |
    ```
    -march=rv64gcv_zba -mabi=lp64d
    ```
+
 ## Run Built-in Test Suite
 
 `avx2rvv` ships with a built-in test suite under the `tests/` directory. You can run all tests or a single test. Test inputs are provided at runtime and results are printed to stdout.
@@ -88,14 +89,17 @@ Options:
   -v, --verbose           Enable verbose output
   -q, --quiet             Suppress output except for errors
   -i, --index INDEX       Run test by index number
+  -s, --suites CASETYPE   Select test suite (default: all → run SSE first, then AVX)
   TEST_NAME               Run specific test by name (supports partial matching)
 
 Examples:
-  ./tests/main                      # Run all tests
-  ./tests/main mm_add_ps            # Run mm_add_ps test
-  ./tests/main --index 5            # Run test at index 5
-  ./tests/main --list               # List all available tests
-  ./tests/main --verbose add        # Run tests matching 'add' with verbose output
+  ./tests/main                        # Run all tests
+  ./tests/main mm_add_ps              # Run mm_add_ps test
+  ./tests/main --index 5              # Run test at index 5
+  ./tests/main --list                 # List all available tests
+  ./tests/main --suite avx            # Run only AVX tests\n
+  ./tests/main --suite sse --index 5  # Run SSE test at index 5
+  ./tests/main --verbose add          # Run tests matching 'add' with verbose output
 
 # Run one case by name
   ./tests/main mm_crc32_u8
@@ -124,6 +128,232 @@ Notes:
 - Use `tests/main` to run the entire test matrix.
 - For single tests, pass the exact test name to `tests/main $CASE`.
 - If you target bare‑metal outputs, integrate with your runner or board bring‑up scripts accordingly.
+
+---
+
+## Real-World Migration Examples
+
+### Case Study 1: Basic SSE&AVX Operations Migration
+
+**Objective**: Demonstrate seamless migration from x86 SSE&AVX to RISC-V RVV
+
+**Source Code** (`testsse.cpp`):
+```c
+#include <stdio.h>
+#include <stdint.h>
+#include "sse2rvv.h"  // Replace <pmmintrin.h> for RISC-V
+#include "avx2rvv.h"  // Replace <immintrin.h> for RISC-V
+
+void sse_example() {
+    int32_t a[4] = {-5, 13, 4, -20};
+    int32_t b[4] = {12, 3, 0, 7};
+    int32_t c[4] = {0};
+
+    // Load 128-bit data (4 x 32-bit integers)
+    __m128i t1 = _mm_loadu_si128((const __m128i*)a);
+    __m128i t2 = _mm_loadu_si128((const __m128i*)b);
+
+    // Execute 128-bit parallel addition
+    __m128i dst = _mm_add_epi32(t1, t2);
+
+    // Store results
+    _mm_storeu_si128((__m128i*)c, dst);
+
+    printf("Result: %d %d %d %d\n", c[0], c[1], c[2], c[3]);
+}
+
+int main(void) {
+    sse_example();
+    return 0;
+}
+```
+
+**Migration Steps**:
+1. Replace `#include <pmmintrin.h>` with `#include "sse2rvv.h"`
+2. No source code changes required
+3. Update compiler flags: `-march=rv64gcv_zba`
+
+**Compilation & Execution**:
+```bash
+# Compile for RISC-V
+riscv64-unknown-linux-gnu-g++ testsse.cpp -o testsse -march=rv64gcv_zba
+
+# Run with QEMU
+QEMU_LD_PREFIX=/opt/riscv/sysroot/ qemu-riscv64 ./testsse
+# Output: Result: 7 16 4 -13
+```
+
+### Case Study 2: Image Processing Application
+
+**Project**: [Prefetcher](https://github.com/ryanwang522/prefetcher.git) - Image processing with SIMD optimization
+
+**Migration Process**:
+
+1. **Header Replacement**:
+   ```c
+   // Before (x86)
+   #include <xmmintrin.h>
+   
+   // After (RISC-V)
+   #include "sse2rvv.h"
+   ```
+
+2. **Build Configuration**:
+   ```makefile
+   CC=/path/to/riscv64-unknown-linux-gnu-gcc
+   CFLAGS = -O3 -march=rv64gcv_zba
+   ```
+
+3. **Results**:
+   ```
+   Matrix transpose operation:
+   0  1  2  3
+   4  5  6  7
+   8  9 10 11
+   12 13 14 15
+   
+   Transposed:
+    0  4  8 12
+   1  5  9 13
+   2  6 10 14
+   3  7 11 15
+   
+   SSE processing time: 1553431 us
+   ```
+
+### Case Study 3: Base64 Encoding/Decoding
+
+**Project**: [Base64](https://github.com/aklomp/base64.git) - High-performance encoding library
+
+**Migration Steps**:
+
+1. **Header Updates**:
+   ```c
+   // lib/arch/avx512/codec.c
+   // #include <immintrin.h>
+   #include "avx2rvv.h"
+   
+   // lib/arch/ssse3/codec.c  
+   // #include <immintrin.h>
+   #include "avx2rvv.h"
+   ```
+
+2. **Build Configuration**:
+   ```makefile
+   CC=/path/to/riscv64-unknown-linux-gnu-gcc
+   CFLAGS += -O3 -march=rv64gcv_zba -Wall -Wextra -pedantic \
+             -DBASE64_STATIC_DEFINE -DBASE64_SSSE3_USE_ASM=0 -I.
+   LD=/path/to/riscv64-unknown-linux-gnu-ld
+   OBJCOPY=/path/to/riscv64-unknown-linux-gnu-objcopy
+   ```
+
+3. **Compilation**:
+   ```bash
+   export SSSE3_CFLAGS=
+   export AVX512_CFLAGS=
+   make clean && OPENMP=1 make && OPENMP=1 make -C test
+   ```
+
+4. **Result** (10MB buffer):
+   ```
+   Plain   encode:  801.69 MB/sec
+   Plain   decode: 1195.70 MB/sec
+   SSSE3   encode:  503.53 MB/sec
+   SSSE3   decode:  556.33 MB/sec
+   SSE41   encode:  705.87 MB/sec
+   SSE41   decode:  598.00 MB/sec
+   AVX512  encode:  269.52 MB/sec
+   ```
+
+### Migration Best Practices
+
+**1. Systematic Migration Approach**:
+```bash
+# Step 1: Identify SIMD usage
+grep -r "_mm_" src/ | grep -E "(include|#include)"
+
+# Step 2: Replace headers
+find . -name "*.c" -o -name "*.cpp" | xargs sed -i 's/#include <.*mmintrin\.h>/#include "sse2rvv.h"/g'
+find . -name "*.c" -o -name "*.cpp" | xargs sed -i 's/#include <immintrin\.h>/#include "avx2rvv.h"/g'
+
+# Step 3: Update build system
+sed -i 's/-march=native/-march=rv64gcv_zba/g' Makefile
+```
+
+**2. Compatibility Verification**:
+```c
+// Add runtime checks for unsupported functions
+#ifdef __riscv
+    // Check for RVV support
+    if (__riscv_v_elen < 128) {
+        fprintf(stderr, "Warning: RVV not supported, falling back to scalar\n");
+        use_scalar_implementation();
+        return;
+    }
+#endif
+```
+
+**3. Performance Validation**:
+```c
+// Benchmark both implementations
+void benchmark_migration() {
+    clock_t start, end;
+    
+    // Test original x86 implementation
+    start = clock();
+    x86_simd_function();
+    end = clock();
+    double x86_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+    
+    // Test RISC-V implementation  
+    start = clock();
+    riscv_simd_function();
+    end = clock();
+    double riscv_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+    
+    printf("Performance ratio (RISC-V/x86): %.2f\n", riscv_time / x86_time);
+}
+```
+
+### Common Migration Challenges and Solutions
+
+**1. Unsupported Intrinsics**:
+```c
+// Problem: _mm_prefetch not implemented
+// Solution: Use compiler hints or manual prefetching
+#ifdef __riscv
+    // Manual prefetch simulation
+    __builtin_prefetch(ptr, 0, 3);  // Read, high temporal locality
+#else
+    _mm_prefetch(ptr, _MM_HINT_T1);
+#endif
+```
+
+**2. Assembly Code Compatibility**:
+```c
+// Problem: Inline assembly not portable
+// Solution: Conditional compilation
+#ifdef __riscv
+    // Use RVV intrinsics instead of assembly
+    __m512i result = _mm512_add_epi32(a, b);
+#elif defined(__x86_64__)
+    // Original x86 assembly
+    asm volatile ("vpaddd %0, %1, %2" : "=x"(result) : "x"(a), "x"(b));
+#endif
+```
+
+**3. Memory Alignment Issues**:
+```c
+// Problem: Different alignment requirements
+// Solution: Use portable alignment
+void* aligned_alloc_portable(size_t alignment, size_t size) {
+#ifdef __riscv
+    return aligned_alloc(alignment, size);
+#else
+    return _mm_malloc(size, alignment);
+#endif
+}
+```
 
 ---
 
