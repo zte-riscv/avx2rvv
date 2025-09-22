@@ -6,6 +6,7 @@
 
 #if defined(__riscv) || defined(__riscv__)
 #include "sse2rvv.h"
+#include "avx2rvv.h"
 #elif defined(__x86_64__) || defined(__i386__)
 #include <emmintrin.h>
 #include <smmintrin.h>
@@ -13,6 +14,7 @@
 #include <wmmintrin.h>
 #include <x86intrin.h>
 #include <xmmintrin.h>
+#include <immintrin.h>
 #endif
 
 namespace SSE2RVV {

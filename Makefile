@@ -6,9 +6,9 @@ CXX     ?= g++
 ifeq ($(origin CROSS_COMPILE), undefined)
     processor := $(shell uname -m)
     ifeq ($(processor), x86_64)
-        ARCH_CFLAGS = -maes -mpclmul -mssse3 -msse4.2
+        ARCH_CFLAGS = -maes -mpclmul -mssse3 -msse4.2 -mavx -mavx2 -mavx512f -mavx512bw
     else ifeq ($(processor), i386)
-        ARCH_CFLAGS = -maes -mpclmul -mssse3 -msse4.2
+        ARCH_CFLAGS = -maes -mpclmul -mssse3 -msse4.2 -mavx -mavx2
     else
         ARCH_CFLAGS =
     endif
@@ -33,7 +33,7 @@ else
     endif
 
     ifeq ($(processor),$(filter $(processor),i386 x86_64))
-        ARCH_CFLAGS = -maes -mpclmul -mssse3 -msse4.2
+        ARCH_CFLAGS = -maes -mpclmul -mssse3 -msse4.2 -mavx -mavx2 -mavx512f -mavx512bw
     else
         ARCH_CFLAGS = -march=$(processor)gcv_zba
     endif
@@ -52,7 +52,7 @@ CXXFLAGS += -Wall -Wcast-qual -I. $(ARCH_CFLAGS)
 LDFLAGS  += -lm
 
 # Source and object files
-SRCS     := tests/binding.cpp tests/common.cpp tests/debug_tools.cpp tests/sse_impl.cpp tests/main.cpp
+SRCS     := tests/binding.cpp tests/common.cpp tests/debug_tools.cpp tests/sse_impl.cpp tests/avx_impl.cpp tests/main.cpp
 OBJS     := $(SRCS:.cpp=.o)
 deps     := $(OBJS:.o=.o.d)
 
@@ -72,14 +72,14 @@ $(EXEC): $(OBJS)
 # Test rule
 test: $(EXEC)
 ifeq ($(processor),$(filter $(processor),rv32 rv64))
-	$(CC) $(ARCH_CFLAGS) -c sse2rvv.h
+	$(CC) $(ARCH_CFLAGS) -c sse2rvv.h avx2rvv.h
 endif
 	$(SIMULATOR) $(SIMULATOR_FLAGS) $^
 
 # Build-test rule
 build-test: $(EXEC)
 ifeq ($(processor),$(filter $(processor),rv32 rv64))
-	$(CC) $(ARCH_CFLAGS) -c sse2rvv.h
+	$(CC) $(ARCH_CFLAGS) -c sse2rvv.h avx2rvv.h
 endif
 
 # Formatting
@@ -88,11 +88,11 @@ format:
 	@if ! hash clang-format 2>/dev/null; then \
         echo "clang-format is required to indent"; exit 1; \
     fi
-	clang-format -i sse2rvv.h $(SRCS) tests/*.h
+	clang-format -i sse2rvv.h avx2rvv.h $(SRCS) tests/*.h
 
 # Clean rules
 clean:
-	$(RM) $(OBJS) $(EXEC) $(deps) sse2rvv.h.gch
+	$(RM) $(OBJS) $(EXEC) $(deps) sse2rvv.h.gch avx2rvv.h.gch
 
 clean-all: clean
 	$(RM) *.log

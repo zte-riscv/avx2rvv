@@ -1,8 +1,9 @@
-#ifndef SSE2RVV_COMMON_H
-#define SSE2RVV_COMMON_H
+#ifndef AVX2RVV_COMMON_H
+#define AVX2RVV_COMMON_H
 #include <cstdint>
 #if defined(__riscv) || defined(__riscv__)
 #include "sse2rvv.h"
+#include "avx2rvv.h"
 #elif defined(__x86_64__) || defined(__i386__)
 #include <emmintrin.h>
 #include <smmintrin.h>
@@ -10,6 +11,7 @@
 #include <wmmintrin.h>
 #include <x86intrin.h>
 #include <xmmintrin.h>
+#include <immintrin.h>
 
 // __int64 is defined in the Intrinsics Guide which maps to different datatype
 // in different data model
@@ -48,6 +50,10 @@ typedef union ALIGN_STRUCT(16) SIMDVec {
 /* _mm_min|max_ps|ss|pd|sd */
 #ifndef SSE2RVV_PRECISE_MINMAX
 #define SSE2RVV_PRECISE_MINMAX (0)
+#endif
+/* Keep AVX test suite using the same precise min/max behavior */
+#ifndef AVX2RVV_PRECISE_MINMAX
+#define AVX2RVV_PRECISE_MINMAX SSE2RVV_PRECISE_MINMAX
 #endif
 #endif
 
