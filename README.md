@@ -1,4 +1,6 @@
-# AVX2RVV: AVX512 Intrinsics Implementation for RISC-V Vector Extension
+# AVX2RVV
+
+AVX512 Intrinsics Implementation for RISC-V Vector Extension
 
 ## Overview
 
@@ -367,6 +369,73 @@ void* aligned_alloc_portable(size_t alignment, size_t size) {
 - [riscv-v-spec](https://github.com/riscv/riscv-v-spec)
 - [rvv-intrinsic-doc](https://github.com/riscv-non-isa/rvv-intrinsic-doc)
 - [riscv-c-api](https://github.com/riscv-non-isa/riscv-c-api-doc/blob/master/riscv-c-api.md)
+
+---
+
+## Development Roadmap
+
+This project is under active development with a clear roadmap for expanding SIMD intrinsic support across different Intel x86 architectures.
+
+## Function Statistics & Priority Analysis
+
+Based on comprehensive analysis of x86 SIMD intrinsic usage patterns, we have identified the following function distribution:
+
+| Vector Type | Header Files | Total Functions | High-Frequency Functions | Priority Level |
+|-------------|--------------|-----------------|-------------------------|----------------|
+| **AVX** | `immintrin.h` | 191 | 191 (100%) | 🔴 **Critical** |
+| **AVX2** | `immintrin.h` | 233 | 191 (82%) | 🔴 **Critical** |
+| **AVX512** | `immintrin.h`<br>`avx512fintrin.h`<br>`avx512vfintrin.h` | 2,665 | 2,624 (98%) | 🟡 **High** |
+| **AVX512 Extensions** | Various | 2,459 | 1,855 (75%) | 🟢 **Medium** |
+| **AVX512 Compute** | Various | 132 | 64 (48%) | 🔵 **Low** |
+| **Total** | - | **6,327** | **5,554 (88%)** | - |
+
+### Phase 1: Foundation & High-Priority Implementation
+**Target Completion: December, 2025**
+
+- **Priority Focus**: Complete AVX and AVX2 intrinsic libraries (384 functions)
+- **Scope**: Organize and submit existing developed functions and test cases
+- **Deliverables**: 
+  - Complete AVX/AVX2 function library (100% coverage)
+  - Performance benchmarking suite
+- **Rationale**: AVX/AVX2 show 100% and 82% high-frequency usage respectively
+
+### Phase 2: AVX512 Core Implementation
+**Target Completion: July 2026**
+
+- **Implementation Strategy**: Focus on high-frequency AVX512 functions (2,624 functions)
+- **Batch Development**: 200-300 functions per month
+- **Coverage Goals**:
+  - Complete core AVX512 intrinsic function library (98% high-frequency coverage)
+  - Comprehensive test suite for all implemented functions
+  - Performance optimization for RISC-V Vector Extension
+- **Quality Assurance**: Each batch includes comprehensive testing, documentation, and benchmarking
+
+### Phase 3: AVX512 Extensions & Specialized Functions
+**Target Completion: October, 2026**
+
+- **Implementation Strategy**: Batch development approach (200-300 functions per month)
+- **Coverage Goals**:
+  - Complete AVX intrinsic function library
+  - Complete AVX2 intrinsic function library  
+  - Complete AVX512 intrinsic function library
+  - Full test suite coverage for all implemented functions
+- **Quality Assurance**: Each batch includes comprehensive testing and documentation
+
+## Development Philosophy
+
+- **Data-Driven**: Prioritize functions based on comprehensive usage analysis (88% high-frequency coverage)
+- **Quality-First**: Every function includes comprehensive test cases and documentation
+- **Performance-Oriented**: Optimize for RISC-V Vector Extension efficiency
+- **Community-Focused**: Open development process with regular milestone releases
+- **Backward Compatible**: Maintain API compatibility throughout development phases
+
+### Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to:
+- Report bugs and request features
+- Submit pull requests
+- Contribute to test cases
+- Help with documentation
 
 ---
 
